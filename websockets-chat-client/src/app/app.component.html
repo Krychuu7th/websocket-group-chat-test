@@ -1,0 +1,46 @@
+<div class="d-flex justify-content-center p-4">
+  @if (!webSocketService.isConnected) {
+  <mat-form-field class="example-form-field">
+    <mat-label>Nazwa użytkownika</mat-label>
+    <input matInput type="text" [formControl]="userControl" />
+  </mat-form-field>
+  <mat-form-field class="example-form-field ms-2">
+    <mat-label>ID chatu</mat-label>
+    <input matInput type="text" [formControl]="chatIdControl" />
+  </mat-form-field>
+  <button class="ms-2" mat-fab color="primary" (click)="onConnect()">
+    <mat-icon>arrow_forward</mat-icon>
+  </button>
+  } @if (webSocketService.isConnected) {
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>Czat grupowy</mat-card-title>
+      <mat-card-subtitle>Połączony jako {{ user }}</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      <div *ngFor="let message of webSocketService.messages" class="d-flex flex-column my-3" [ngClass]="{ 'text-end': false }">
+        <!-- <span class="user-label">Użytkownik</span> -->
+        <span class="message">
+          {{ message }}
+        </span>
+      </div>
+    </mat-card-content>
+    <mat-card-footer class="m-3">
+      <mat-form-field class="example-form-field">
+        <mat-label>Nazwa użytkownika</mat-label>
+        <input matInput type="text" [formControl]="messageControl" />
+      </mat-form-field>
+      <button class="ms-2" mat-fab color="primary" (click)="onSendMessage()">
+        <mat-icon>arrow_forward</mat-icon>
+      </button>
+      <button class="ms-2" mat-fab color="secondary" (click)="onDisconnect()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </mat-card-footer>
+  </mat-card>
+  }
+</div>
+
+<div class="b-"></div>
+
+<router-outlet></router-outlet>
