@@ -1,5 +1,7 @@
 package marcin.krysiak.websocketschat.chat.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.SneakyThrows;
 import marcin.krysiak.websocketschat.chat.model.ChatMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -13,8 +15,11 @@ public class MessageController {
     SimpMessagingTemplate simpMessagingTemplate;
 
     @MessageMapping("/message")
+    @SneakyThrows
     public void publishMessage(ChatMessage message) throws InterruptedException {
+        ObjectMapper objectMapper = new ObjectMapper();
+
         this.simpMessagingTemplate.convertAndSend("/topic/messages-" + message.getChatId(),
-                message.getSender() + ": " + message.getContent());
+                objectMapper.writeValueAsString(message));
     }
 }

@@ -2,11 +2,11 @@
   @if (!webSocketService.isConnected) {
   <mat-form-field class="example-form-field">
     <mat-label>Nazwa użytkownika</mat-label>
-    <input matInput type="text" [formControl]="userControl" />
+    <input matInput type="text" [formControl]="userControl" (keydown.enter)="onConnect()" />
   </mat-form-field>
   <mat-form-field class="example-form-field ms-2">
     <mat-label>ID chatu</mat-label>
-    <input matInput type="text" [formControl]="chatIdControl" />
+    <input matInput type="text" [formControl]="chatIdControl" (keydown.enter)="onConnect()" />
   </mat-form-field>
   <button class="ms-2" mat-fab color="primary" (click)="onConnect()">
     <mat-icon>arrow_forward</mat-icon>
@@ -19,16 +19,16 @@
     </mat-card-header>
     <mat-card-content>
       <div *ngFor="let message of webSocketService.messages" class="d-flex flex-column my-3" [ngClass]="{ 'text-end': false }">
-        <!-- <span class="user-label">Użytkownik</span> -->
+        <span class="user-label">{{ message.sender }}</span>
         <span class="message">
-          {{ message }}
+          {{ message.content }}
         </span>
       </div>
     </mat-card-content>
     <mat-card-footer class="m-3">
       <mat-form-field class="example-form-field">
-        <mat-label>Nazwa użytkownika</mat-label>
-        <input matInput type="text" [formControl]="messageControl" />
+        <mat-label>Wpisz wiadomość...</mat-label>
+        <input matInput type="text" [formControl]="messageControl" (keydown.enter)="onSendMessage()" />
       </mat-form-field>
       <button class="ms-2" mat-fab color="primary" (click)="onSendMessage()">
         <mat-icon>arrow_forward</mat-icon>

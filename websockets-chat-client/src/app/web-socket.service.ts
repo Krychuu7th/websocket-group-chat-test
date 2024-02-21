@@ -1,8 +1,6 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
-import { webSocket, WebSocketSubject } from 'rxjs/webSocket';
-import * as Stomp from 'stompjs';
+import { ChatMessage } from './app.models';
+import { Client, Message, Frame, Stomp } from '@stomp/stompjs';
 
 @Injectable({
   providedIn: 'root'
@@ -10,20 +8,20 @@ import * as Stomp from 'stompjs';
 export class WebSocketService {
   private socketEp = "ws://localhost:8080/our-ws";
   private isConnectionEstablished: boolean = false;
-  private socketClient: any;
+  private socketClient: Client | any = undefined;
   private chatId: string | undefined = undefined;
-  private wsMessages: string[] = [];
+  private chatMessages: ChatMessage[] = [];
 
   connect(chatId: string) {
     this.chatId = chatId;
-    this.socketClient = Stomp.over(new WebSocket(this.socketEp));
+    this.socketClient = Stomp.client(this.socketEp);
+    this.socketClient.reconnect_delay = 5000;
 
-    this.socketClient.connect({}, (frame: any) => {
+    this.socketClient.connect({}, (frame: Frame) => {
       this.isConnectionEstablished = true;
-      console.log(frame);
 
-      this.socketClient.subscribe(`/topic/messages-${this.chatId}`, (message: Stomp.Message) => {
-        this.wsMessages.push(message.body);
+      this.socketClient.subscribe(`/topic/messages-${this.chatId}`, (message: Message) => {
+        this.chatMessages.push(JSON.parse(message.body) as ChatMessage);
       });
     }
     );
@@ -33,14 +31,14 @@ export class WebSocketService {
 
   disconnect() {
     this.socketClient.disconnect(() => {
-      console.log('Disconnected');
       this.setConnected(false);
       this.chatId = undefined;
+      this.chatMessages = [];
     });
   }
 
   sendMessage(message: string, username: string) {
-    this.socketClient.send("/ws/message", {}, JSON.stringify({ sender: username ?? 'testUser', content: message ?? 'test message', type: 'MESSAGE', chatId: this.chatId }));
+    this.socketClient.send("/ws/message", {}, JSON.stringify({ sender: username, content: message, type: 'MESSAGE', chatId: this.chatId }));
   }
 
   setConnected(connected: boolean) {
@@ -51,8 +49,8 @@ export class WebSocketService {
     return this.isConnectionEstablished;
   }
 
-  get messages(): string[] {
-    return this.wsMessages;
+  get messages(): ChatMessage[] {
+    return this.chatMessages;
   }
 }
 

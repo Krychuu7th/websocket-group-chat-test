@@ -9,8 +9,6 @@ import { RouterOutlet } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { WebSocketSubject } from 'rxjs/webSocket';
 import { Observable } from 'rxjs';
-import * as Stomp from 'stompjs';
-import * as SockJS from 'sockjs-client';
 import { WebSocketService } from './web-socket.service';
 
 interface Message {
